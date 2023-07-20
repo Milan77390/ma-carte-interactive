@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monuments Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+</head>
+<body>
+    <div id="map" style="width: 600px; height: 400px;"></div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Votre code initial pour initialiser la carte
+        var map = L.map('map').setView([51.505, -0.09], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        // Le gestionnaire d'événement "click" pour ajouter des monuments
+        map.on('click', function(e) {
+            var monumentName = prompt("Veuillez entrer le nom du monument:");
+            if (monumentName && monumentName !== '') {
+                var marker = L.marker(e.latlng).addTo(map);
+                marker.bindPopup(monumentName).openPopup();
+
+                // Le code pour ajouter le monument à GitHub irait ici...
+            }
+        });
+
+        // Le code pour interagir avec GitHub (à inclure dans votre version réelle seulement si vous avez une solution pour sécuriser votre jeton d'accès)
+        const GITHUB_TOKEN = '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';
+        function saveToGithub(data) {
+    fetch('https://api.github.com/repos/VOTRE_NOM_UTILISATEUR/monuments-data/contents/data.geojson', {
+        method: 'PUT',
+        headers: {
+            'Authorization': 'token ' + GITHUB_TOKEN,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            message: 'Ajout d’un nouveau monument',
+            content: btoa(JSON.stringify(data)),  // Encodage en base64
+            branch: 'main'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+    });
+}
+
+// À intégrer dans le gestionnaire d'événement "click" précédent :
+map.on('click', function(e) {
+    var monumentName = prompt("Veuillez entrer le nom du monument:");
+    if (monumentName && monumentName !== '') {
+        var marker = L.marker(e.latlng).addTo(map);
+        marker.bindPopup(monumentName).openPopup();
+        
+        // Ajout du nouveau monument à un objet GeoJSON
+        var newMonument = {
+            type: "Feature",
+            geometry: {
+                type: "Point",
+                coordinates: [e.latlng.lng, e.latlng.lat]
+            },
+            properties: {
+                name: monumentName
+            }
+        };
+        
+        // Ici, on devrait récupérer l'actuel GeoJSON depuis GitHub, y ajouter le nouveau monument, puis sauvegarder le tout sur GitHub.
+        // Pour simplifier, nous n’allons qu’appeler saveToGithub avec le nouveau monument :
+        saveToGithub(newMonument);
+    }
+});
+    </script>
+</body>
+</html>
+
+
