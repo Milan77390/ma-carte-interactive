@@ -32,6 +32,16 @@
             height: 40px;
             cursor: pointer;
         }
+
+        /* Curseur personnalisé lorsque l'ajout de monument est activé */
+        .leaflet-grab .leaflet-control-addmarker {
+            cursor: crosshair;
+        }
+
+        /* Style pour le bouton en mode actif */
+        .leaflet-control-addmarker.active {
+            background-color: rgba(255,0,0,0.5);
+        }
     </style>
 </head>
 
@@ -77,21 +87,30 @@
                 container.title = "Ajouter un monument";
                 L.DomEvent.on(container, 'click', function(event) {
                     L.DomEvent.stopPropagation(event); // Empêcher la propagation de l'événement de clic
-                    addingMonument = !addingMonument; // Toggle de l'état
-                    if (addingMonument) {
-                        container.style.backgroundColor = 'rgba(255,0,0,0.5)'; 
-                    } else {
-                        container.style.backgroundColor = 'rgba(255,255,255,0.9)';
-                    }
+                    toggleAddingMonument(); // Appeler la fonction pour activer/désactiver l'ajout de monument
                 });
                 return container;
             }
         });
         map.addControl(new AddMarkerControl());
 
-        map.on('click', function (e) {
-            if (!addingMonument) return; 
+        // Fonction pour activer/désactiver l'ajout de monument
+        function toggleAddingMonument() {
+            addingMonument = !addingMonument; // Toggle de l'état
+            var button = document.querySelector('.leaflet-control-addmarker');
+            if (addingMonument) {
+                button.classList.add('active'); // Ajouter la classe 'active' pour mettre le bouton en rouge
+                map.dragging.disable(); // Désactiver le déplacement de la carte pendant l'ajout de monument
+                map.on('click', onMapClick); // Activer l'écouteur d'événement click sur la carte
+            } else {
+                button.classList.remove('active'); // Supprimer la classe 'active' pour revenir au style normal
+                map.dragging.enable(); // Réactiver le déplacement de la carte après l'ajout de monument
+                map.off('click', onMapClick); // Désactiver l'écouteur d'événement click sur la carte
+            }
+        }
 
+        // Fonction appelée lorsqu'on clique sur la carte en mode ajout de monument
+        function onMapClick(e) {
             var monumentName = prompt("Veuillez entrer le nom du monument:");
             if (monumentName && monumentName !== '') {
                 var marker = L.marker(e.latlng).addTo(map);
@@ -111,11 +130,7 @@
 
                 saveToGithub(newMonument);
             }
-            
-            // Désactiver le mode d'ajout après avoir ajouté le monument
-            addingMonument = false;
-            document.querySelector('.leaflet-control-addmarker').style.backgroundColor = 'rgba(255,255,255,0.9)';
-        });
+        }
 
         const GITHUB_TOKEN = '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';
 
