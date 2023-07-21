@@ -23,7 +23,7 @@
         }
 
         .leaflet-control-addmarker {
-            background-color: rgba(255,255,255,0.9);
+            background-color: rgba(255, 255, 255, 0.9);
             background-image: url('images.png'); /* Utilisation de l'image images.png */
             background-position: 50% 50%;
             background-repeat: no-repeat;
@@ -31,16 +31,6 @@
             width: 40px;
             height: 40px;
             cursor: pointer;
-        }
-
-        /* Curseur personnalisé lorsque l'ajout de monument est activé */
-        .leaflet-grab .leaflet-control-addmarker {
-            cursor: crosshair;
-        }
-
-        /* Style pour le bouton en mode actif */
-        .leaflet-control-addmarker.active {
-            background-color: rgba(255,0,0,0.5);
         }
     </style>
 </head>
@@ -73,41 +63,21 @@
             }).addTo(map);
         });
 
-        // État pour savoir si on est en mode d'ajout de monument
-        var addingMonument = false;
-
         // Ajout d'un bouton personnalisé pour l'ajout de monuments
-        var AddMarkerControl = L.Control.extend({
-            options: {
-                position: 'topright'
-            },
+        var addMarkerButton = L.control({position: 'topright'});
 
-            onAdd: function (map) {
-                var container = L.DomUtil.create('div', 'leaflet-control-addmarker');
-                container.title = "Ajouter un monument";
-                L.DomEvent.on(container, 'click', function(event) {
-                    L.DomEvent.stopPropagation(event); // Empêcher la propagation de l'événement de clic
-                    toggleAddingMonument(); // Appeler la fonction pour activer/désactiver l'ajout de monument
-                });
-                return container;
-            }
-        });
-        map.addControl(new AddMarkerControl());
-
-        // Fonction pour activer/désactiver l'ajout de monument
-        function toggleAddingMonument() {
-            addingMonument = !addingMonument; // Toggle de l'état
-            var button = document.querySelector('.leaflet-control-addmarker');
-            if (addingMonument) {
-                button.classList.add('active'); // Ajouter la classe 'active' pour mettre le bouton en rouge
-                map.dragging.disable(); // Désactiver le déplacement de la carte pendant l'ajout de monument
+        addMarkerButton.onAdd = function (map) {
+            var container = L.DomUtil.create('div', 'leaflet-control-addmarker');
+            container.title = "Ajouter un monument";
+            L.DomEvent.on(container, 'click', function() {
                 map.on('click', onMapClick); // Activer l'écouteur d'événement click sur la carte
-            } else {
-                button.classList.remove('active'); // Supprimer la classe 'active' pour revenir au style normal
-                map.dragging.enable(); // Réactiver le déplacement de la carte après l'ajout de monument
-                map.off('click', onMapClick); // Désactiver l'écouteur d'événement click sur la carte
-            }
-        }
+                container.style.backgroundColor = 'rgba(255,0,0,0.5)';
+                container.style.cursor = 'crosshair';
+            });
+            return container;
+        };
+
+        addMarkerButton.addTo(map);
 
         // Fonction appelée lorsqu'on clique sur la carte en mode ajout de monument
         function onMapClick(e) {
@@ -130,6 +100,10 @@
 
                 saveToGithub(newMonument);
             }
+            map.off('click', onMapClick); // Désactiver l'écouteur d'événement click sur la carte après avoir ajouté le monument
+            var addButton = document.querySelector('.leaflet-control-addmarker');
+            addButton.style.backgroundColor = 'rgba(255,255,255,0.9)';
+            addButton.style.cursor = 'pointer';
         }
 
         const GITHUB_TOKEN = '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';
