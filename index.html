@@ -27,10 +27,11 @@
             background-image: url('images.png'); /* Utilisation de l'image images.png */
             background-position: 50% 50%;
             background-repeat: no-repeat;
-            background-size: 20px;
+            background-size: 100%; /* Le logo du bouton prend toute la place */
             width: 40px;
             height: 40px;
             cursor: pointer;
+            border: none; /* Supprimer la bordure */
         }
     </style>
 </head>
@@ -51,7 +52,7 @@
         L.Control.geocoder().addTo(map);
 
         // Charger et ajouter le GeoJSON à la carte depuis GitHub Pages
-        fetch("https://Milan77390.github.io/ma-carte-interactive/sites_dangers2.geojson")
+        fetch("sites_dangers2.geojson")
         .then(response => response.json())
         .then(data => {
             L.geoJSON(data, {
