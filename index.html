@@ -75,7 +75,8 @@
             onAdd: function (map) {
                 var container = L.DomUtil.create('div', 'leaflet-control-addmarker');
                 container.title = "Ajouter un monument";
-                L.DomEvent.on(container, 'click', function() {
+                L.DomEvent.on(container, 'click', function(event) {
+                    L.DomEvent.stopPropagation(event); // Empêcher la propagation de l'événement de clic
                     addingMonument = !addingMonument; // Toggle de l'état
                     if (addingMonument) {
                         container.style.backgroundColor = 'rgba(255,0,0,0.5)'; 
