@@ -21,6 +21,13 @@
             width: 100%;
             height: 100%;
         }
+
+        .leaflet-control-addmarker {
+            background-color: rgba(255,255,255,0.9);
+            width: 26px;
+            height: 26px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -52,7 +59,34 @@
             }).addTo(map);
         });
 
+        // État pour savoir si on est en mode d'ajout de monument
+        var addingMonument = false;
+
+        // Ajout d'un bouton personnalisé pour l'ajout de monuments
+        var AddMarkerControl = L.Control.extend({
+            options: {
+                position: 'topleft'
+            },
+
+            onAdd: function (map) {
+                var container = L.DomUtil.create('div', 'leaflet-control-addmarker');
+                container.title = "Ajouter un monument";
+                L.DomEvent.on(container, 'click', function() {
+                    addingMonument = !addingMonument; // Toggle de l'état
+                    if (addingMonument) {
+                        container.style.backgroundColor = 'rgba(255,0,0,0.5)'; 
+                    } else {
+                        container.style.backgroundColor = 'rgba(255,255,255,0.9)';
+                    }
+                });
+                return container;
+            }
+        });
+        map.addControl(new AddMarkerControl());
+
         map.on('click', function (e) {
+            if (!addingMonument) return; 
+
             var monumentName = prompt("Veuillez entrer le nom du monument:");
             if (monumentName && monumentName !== '') {
                 var marker = L.marker(e.latlng).addTo(map);
@@ -71,6 +105,10 @@
 
                 saveToGithub(newMonument);
             }
+            
+            // Désactiver le mode d'ajout après avoir ajouté le monument
+            addingMonument = false;
+            document.querySelector('.leaflet-control-addmarker').style.backgroundColor = 'rgba(255,255,255,0.9)';
         });
 
         const GITHUB_TOKEN = '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';
