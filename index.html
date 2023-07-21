@@ -5,29 +5,46 @@
     <title>Monuments Map</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Styles Leaflet et plugin de recherche -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
+    <style>
+        /* Style pour que la carte prenne toute la fenêtre du navigateur */
+        body, html {
+            height: 100%;
+            margin: 0;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="map" style="width: 600px; height: 400px;"></div>
+    <div id="map"></div>
 
+    <!-- Scripts Leaflet, plugin Esri et plugin de recherche -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/esri-leaflet@3.0.3/dist/esri-leaflet.js"></script>
-    <script>
-        // Initialiser la carte centrée sur la France
-        var map = L.map('map').setView([46.603354, 1.888334], 6); // Coordonnées pour la France
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
-        // Utilisation du fond de carte Esri Dark Gray Canvas
+    <script>
+        var map = L.map('map').setView([46.603354, 1.888334], 6); // Coordonnées pour la France
         L.esri.basemapLayer('DarkGray').addTo(map);
 
-        // Le gestionnaire d'événement "click" pour ajouter des monuments
+        // Ajout du contrôle de recherche
+        L.Control.geocoder().addTo(map);
+
         map.on('click', function (e) {
             var monumentName = prompt("Veuillez entrer le nom du monument:");
             if (monumentName && monumentName !== '') {
                 var marker = L.marker(e.latlng).addTo(map);
                 marker.bindPopup(monumentName).openPopup();
 
-                // Ajout du nouveau monument à un objet GeoJSON
                 var newMonument = {
                     type: "Feature",
                     geometry: {
@@ -39,13 +56,10 @@
                     }
                 };
 
-                // Ici, on devrait récupérer l'actuel GeoJSON depuis GitHub, y ajouter le nouveau monument, puis sauvegarder le tout sur GitHub.
-                // Pour simplifier, nous n’allons qu’appeler saveToGithub avec le nouveau monument :
                 saveToGithub(newMonument);
             }
         });
 
-        // Votre code pour interagir avec GitHub (N'utilisez ceci qu'en environnement sécurisé pour éviter l'exposition de votre token)
         const GITHUB_TOKEN = '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';
 
         function saveToGithub(data) {
@@ -57,7 +71,7 @@
                 },
                 body: JSON.stringify({
                     message: 'Ajout d’un nouveau monument',
-                    content: btoa(JSON.stringify(data)), // Encodage en base64
+                    content: btoa(JSON.stringify(data)),
                     branch: 'main'
                 })
             })
