@@ -70,22 +70,27 @@
             var container = L.DomUtil.create('div', 'leaflet-control-addmarker');
             container.title = "Ajouter un monument";
             L.DomEvent.on(container, 'click', function() {
-                map.on('click', onMapClick); // Activer l'écouteur d'événement click sur la carte
                 container.style.backgroundColor = 'rgba(255,0,0,0.5)';
                 container.style.cursor = 'crosshair';
+                map.on('click', onMapClick); // Activer l'écouteur d'événement click sur la carte
             });
             return container;
         };
 
         addMarkerButton.addTo(map);
 
+        var markerAdded = false;
+
         // Fonction appelée lorsqu'on clique sur la carte en mode ajout de monument
         function onMapClick(e) {
+            if (markerAdded) return; // Si un marker a déjà été ajouté, on ne fait rien
+
             var monumentName = prompt("Veuillez entrer le nom du monument:");
             if (monumentName && monumentName !== '') {
                 var marker = L.marker(e.latlng).addTo(map);
                 var popup = L.popup().setContent(monumentName);
                 marker.bindPopup(popup).openPopup();
+                markerAdded = true; // On indique qu'un marker a été ajouté
 
                 var newMonument = {
                     type: "Feature",
