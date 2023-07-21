@@ -39,6 +39,19 @@
         // Ajout du contrôle de recherche
         L.Control.geocoder().addTo(map);
 
+        // Charger et ajouter le GeoJSON à la carte depuis GitHub Pages
+        fetch("https://Milan77390.github.io/ma-carte-interactive/sites_dangers2.geojson")
+        .then(response => response.json())
+        .then(data => {
+            L.geoJSON(data, {
+                onEachFeature: function (feature, layer) {
+                    if (feature.properties && feature.properties.Bâtiments) {
+                        layer.bindPopup(feature.properties.Bâtiments);
+                    }
+                }
+            }).addTo(map);
+        });
+
         map.on('click', function (e) {
             var monumentName = prompt("Veuillez entrer le nom du monument:");
             if (monumentName && monumentName !== '') {
@@ -63,7 +76,7 @@
         const GITHUB_TOKEN = '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';
 
         function saveToGithub(data) {
-            fetch('https://api.github.com/repos/Milan7390/monuments-data/contents/data.geojson', {
+            fetch('https://api.github.com/repos/Milan77390/ma-carte-interactive/contents/data.geojson', {
                 method: 'PUT',
                 headers: {
                     'Authorization': 'token ' + GITHUB_TOKEN,
@@ -87,5 +100,3 @@
 </body>
 
 </html>
-
-
