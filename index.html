@@ -24,8 +24,12 @@
 
         .leaflet-control-addmarker {
             background-color: rgba(255,255,255,0.9);
-            width: 26px;
-            height: 26px;
+            background-image: url('images.png'); /* Utilisation de l'image images.png */
+            background-position: 50% 50%;
+            background-repeat: no-repeat;
+            background-size: 20px;
+            width: 40px;
+            height: 40px;
             cursor: pointer;
         }
     </style>
@@ -65,7 +69,7 @@
         // Ajout d'un bouton personnalisé pour l'ajout de monuments
         var AddMarkerControl = L.Control.extend({
             options: {
-                position: 'topleft'
+                position: 'topright'
             },
 
             onAdd: function (map) {
@@ -90,7 +94,8 @@
             var monumentName = prompt("Veuillez entrer le nom du monument:");
             if (monumentName && monumentName !== '') {
                 var marker = L.marker(e.latlng).addTo(map);
-                marker.bindPopup(monumentName).openPopup();
+                var popup = L.popup().setContent(monumentName);
+                marker.bindPopup(popup).openPopup();
 
                 var newMonument = {
                     type: "Feature",
