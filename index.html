@@ -6,135 +6,57 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Styles Leaflet et plugin de recherche -->
+    <!-- Styles Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 
     <style>
-        /* Style pour que la carte prenne toute la fenêtre du navigateur */
         body, html {
             height: 100%;
             margin: 0;
         }
 
-        #map {
+        #viewDiv {
             width: 100%;
             height: 100%;
         }
-
-        .leaflet-control-addmarker {
-            background-color: rgba(255, 255, 255, 0.9);
-            background-image: url('images.png'); /* Utilisation de l'image images.png */
-            background-position: 50% 50%;
-            background-repeat: no-repeat;
-            background-size: 100%; /* Le logo du bouton prend toute la place */
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            border: none; /* Supprimer la bordure */
-        }
     </style>
+
+    <!-- ArcGIS API for JavaScript -->
+    <script src="https://js.arcgis.com/4.21/"></script>
+
 </head>
 
 <body>
-    <div id="map"></div>
-
-    <!-- Scripts Leaflet, plugin Esri et plugin de recherche -->
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/esri-leaflet@3.0.3/dist/esri-leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <div id="viewDiv"></div>
 
     <script>
-        var map = L.map('map').setView([46.603354, 1.888334], 6); // Coordonnées pour la France
-        L.esri.basemapLayer('DarkGray').addTo(map);
-
-        // Ajout du contrôle de recherche
-        L.Control.geocoder().addTo(map);
-
-        // Charger et ajouter le GeoJSON à la carte depuis GitHub Pages
-        fetch("sites_dangers2.geojson")
-        .then(response => response.json())
-        .then(data => {
-            L.geoJSON(data, {
-                onEachFeature: function (feature, layer) {
-                    if (feature.properties && feature.properties.Bâtiments) {
-                        layer.bindPopup(feature.properties.Bâtiments);
+        require(["esri/Map", "esri/Basemap", "esri/views/SceneView"], (
+            Map,
+            Basemap,
+            SceneView
+        ) => {
+            const map = new Map({
+                basemap: new Basemap({
+                    portalItem: {
+                        id: "0560e29930dc4d5ebeb58c635c0909c9" // References the 3D Topographic Basemap
                     }
-                }
-            }).addTo(map);
-        });
-
-        // Ajout d'un bouton personnalisé pour l'ajout de monuments
-        var addMarkerButton = L.control({position: 'topright'});
-
-        addMarkerButton.onAdd = function (map) {
-            var container = L.DomUtil.create('div', 'leaflet-control-addmarker');
-            container.title = "Ajouter un monument";
-            L.DomEvent.on(container, 'click', function() {
-                container.style.backgroundColor = 'rgba(255,0,0,0.5)';
-                container.style.cursor = 'crosshair';
-                map.on('click', onMapClick); // Activer l'écouteur d'événement click sur la carte
-            });
-            return container;
-        };
-
-        addMarkerButton.addTo(map);
-
-        var markerAdded = false;
-
-        // Fonction appelée lorsqu'on clique sur la carte en mode ajout de monument
-        function onMapClick(e) {
-            if (markerAdded) return; // Si un marker a déjà été ajouté, on ne fait rien
-
-            var monumentName = prompt("Veuillez entrer le nom du monument:");
-            if (monumentName && monumentName !== '') {
-                var marker = L.marker(e.latlng).addTo(map);
-                var popup = L.popup().setContent(monumentName);
-                marker.bindPopup(popup).openPopup();
-                markerAdded = true; // On indique qu'un marker a été ajouté
-
-                var newMonument = {
-                    type: "Feature",
-                    geometry: {
-                        type: "Point",
-                        coordinates: [e.latlng.lng, e.latlng.lat]
-                    },
-                    properties: {
-                        name: monumentName
-                    }
-                };
-
-                saveToGithub(newMonument);
-            }
-            map.off('click', onMapClick); // Désactiver l'écouteur d'événement click sur la carte après avoir ajouté le monument
-            var addButton = document.querySelector('.leaflet-control-addmarker');
-            addButton.style.backgroundColor = 'rgba(255,255,255,0.9)';
-            addButton.style.cursor = 'pointer';
-        }
-
-        const GITHUB_TOKEN = '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';
-
-        function saveToGithub(data) {
-            fetch('https://api.github.com/repos/Milan77390/ma-carte-interactive/contents/data.geojson', {
-                method: 'PUT',
-                headers: {
-                    'Authorization': 'token ' + GITHUB_TOKEN,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: 'Ajout d’un nouveau monument',
-                    content: btoa(JSON.stringify(data)),
-                    branch: 'main'
                 })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
             });
-        }
+
+            const view = new SceneView({
+                container: "viewDiv",
+                map: map,
+                camera: {
+                    position: {
+                        longitude: 2.340861136194503,
+                        latitude: 48.88276594605576,
+                        z: 178.8139155479148
+                    },
+                    heading: 29.620133897254565,
+                    tilt: 65.59724234196116
+                }
+            });
+        });
     </script>
 </body>
 
