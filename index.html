@@ -1,63 +1,27 @@
-<!DOCTYPE html>
-<html>
+require(["esri/Map", "esri/Basemap", "esri/views/SceneView"], (
+  Map,
+  Basemap,
+  SceneView
+) => {
+  const map = new Map({
+    basemap: new Basemap({
+      portalItem: {
+        id: "0560e29930dc4d5ebeb58c635c0909c9" // References the 3D Topographic Basemap
+      }
+    })
+  });
 
-<head>
-    <title>Monuments Map</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Styles ArcGIS API -->
-    <link rel="stylesheet" href="https://js.arcgis.com/4.x/esri/css/main.css" />
-
-    <style>
-        /* Style pour que la carte prenne toute la fenêtre du navigateur */
-        body, html {
-            height: 100%;
-            margin: 0;
-        }
-
-        #viewDiv {
-            width: 100%;
-            height: 100%;
-        }
-    </style>
-</head>
-
-<body>
-    <div id="viewDiv"></div>
-
-    <!-- Scripts ArcGIS API -->
-    <script src="https://js.arcgis.com/4.x/"></script>
-
-    <script>
-        require([
-            "esri/Map",
-            "esri/Basemap",
-            "esri/views/SceneView"
-        ], function (Map, Basemap, SceneView) {
-            const map = new Map({
-                basemap: new Basemap({
-                    portalItem: {
-                        id: "0560e29930dc4d5ebeb58c635c0909c9" // References the 3D Topographic Basemap
-                    }
-                })
-            });
-
-            const view = new SceneView({
-                container: "viewDiv",
-                map: map,
-                camera: {
-                    position: {
-                        longitude: 2.340861136194503,
-                        latitude: 48.88276594605576,
-                        z: 178.8139155479148
-                    },
-                    heading: 29.620133897254565,
-                    tilt: 65.59724234196116
-                }
-            });
-        });
-    </script>
-</body>
-
-</html>
+  const view = new SceneView({
+    container: "viewDiv",
+    map: map,
+    camera: {
+      position: {
+        longitude: 2.340861136194503,
+        latitude: 48.88276594605576,
+        z: 178.8139155479148
+      },
+      heading: 29.620133897254565,
+      tilt: 65.59724234196116
+    }
+  });
+});
